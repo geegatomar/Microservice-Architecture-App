@@ -4,9 +4,9 @@
 Instructions to run,
 
 1. First build all three images in each of the 3 folders as
-docker build -t mongodb-service .
-docker build -t create-forms-service .
-docker build -t google-sheets-service .
+* docker build -t mongodb-service . <br>
+* docker build -t create-forms-service . <br>
+* docker build -t google-sheets-service . <br>
 
 2. docker-compose up
 
