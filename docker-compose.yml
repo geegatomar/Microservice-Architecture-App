@@ -1,0 +1,74 @@
+version: "2.1"
+services:
+  create-forms-service:
+    image: create-forms-service
+    ports:
+      - "3000:3000"
+    depends_on:
+      - message-queue-1
+    command:
+      [
+        "./wait-for-it.sh",
+        "message-queue-1:5672",
+        "-t",
+        "120",
+        "--",
+        "npm",
+        "start",
+      ]
+
+  message-queue-1:
+    image: rabbitmq
+
+  mongodb-service:
+    image: mongodb-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - message-queue-1
+      - message-queue-2
+      - mongo
+    command:
+      [
+        "./wait-for-it.sh",
+        "message-queue-1:5672",
+        "-t",
+        "120",
+        "--",
+        "./wait-for-it.sh",
+        "message-queue-2:5672",
+        "-t",
+        "120",
+        "--",
+        "./wait-for-it.sh",
+        "mongo:27017",
+        "-t",
+        "120",
+        "--",
+        "npm",
+        "start",
+      ]
+
+  message-queue-2:
+    image: rabbitmq
+
+  google-sheets-service:
+    image: google-sheets-service
+    depends_on:
+      - message-queue-2
+      - mongodb-service
+    command:
+      [
+        "./wait-for-it.sh",
+        "message-queue-2:5672",
+        "-t",
+        "120",
+        "--",
+        "npm",
+        "start",
+      ]
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
